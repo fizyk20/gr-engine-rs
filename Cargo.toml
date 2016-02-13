@@ -2,3 +2,8 @@
 name = "gr-engine"
 version = "0.1.0"
 authors = ["Bartłomiej Kamiński <fizyk20@gmail.com>"]
+
+[dependencies]
+differential-geometry = { git = "https://github.com/fizyk20/differential-geometry.git", branch="master" }
+generic-array = "*"
+typenum = "*"
