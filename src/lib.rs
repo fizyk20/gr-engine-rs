@@ -4,3 +4,4 @@ extern crate diffgeom;
 extern crate typenum;
 
 pub mod numeric;
+pub mod coord_systems;

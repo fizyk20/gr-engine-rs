@@ -4,7 +4,7 @@ use std::ops::{Add, Sub, Mul, Div};
 #[derive(Clone, Copy)]
 pub struct StateVector<N: ArrayLength<f64>>(GenericArray<f64, N>) where N::ArrayType: Copy;
 
-impl<N: ArrayLength<f64>> Add<StateVector<N>> for StateVector<N> 
+impl<N: ArrayLength<f64>> Add<StateVector<N>> for StateVector<N>
     where N::ArrayType: Copy
 {
     type Output = StateVector<N>;
@@ -17,7 +17,7 @@ impl<N: ArrayLength<f64>> Add<StateVector<N>> for StateVector<N>
     }
 }
 
-impl<N: ArrayLength<f64>> Sub<StateVector<N>> for StateVector<N> 
+impl<N: ArrayLength<f64>> Sub<StateVector<N>> for StateVector<N>
     where N::ArrayType: Copy
 {
     type Output = StateVector<N>;
@@ -30,7 +30,7 @@ impl<N: ArrayLength<f64>> Sub<StateVector<N>> for StateVector<N>
     }
 }
 
-impl<N: ArrayLength<f64>> Mul<f64> for StateVector<N> 
+impl<N: ArrayLength<f64>> Mul<f64> for StateVector<N>
     where N::ArrayType: Copy
 {
     type Output = StateVector<N>;
@@ -43,7 +43,7 @@ impl<N: ArrayLength<f64>> Mul<f64> for StateVector<N>
     }
 }
 
-impl<N: ArrayLength<f64>> Mul<StateVector<N>> for f64 
+impl<N: ArrayLength<f64>> Mul<StateVector<N>> for f64
     where N::ArrayType: Copy
 {
     type Output = StateVector<N>;
@@ -56,7 +56,7 @@ impl<N: ArrayLength<f64>> Mul<StateVector<N>> for f64
     }
 }
 
-impl<N: ArrayLength<f64>> Div<f64> for StateVector<N> 
+impl<N: ArrayLength<f64>> Div<f64> for StateVector<N>
     where N::ArrayType: Copy
 {
     type Output = StateVector<N>;
