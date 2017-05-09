@@ -15,10 +15,8 @@ impl<M: Mass> CoordinateSystem for EddingtonFinkelstein<M> {
 
 impl<M: Mass> MetricSystem for EddingtonFinkelstein<M> {
     fn g(x: &Point<Self>) -> TwoForm<Self> {
-        let u = x[0];
         let r = x[1];
         let th = x[2];
-        let ph = x[3];
         let m = M::mass();
         TwoForm::new(x.clone(),
                      arr![f64; 
@@ -30,10 +28,8 @@ impl<M: Mass> MetricSystem for EddingtonFinkelstein<M> {
     }
 
     fn inv_g(x: &Point<Self>) -> InvTwoForm<Self> {
-        let u = x[0];
         let r = x[1];
         let th = x[2];
-        let ph = x[3];
         let m = M::mass();
         InvTwoForm::new(x.clone(),
                         arr![f64; 
@@ -46,10 +42,8 @@ impl<M: Mass> MetricSystem for EddingtonFinkelstein<M> {
 
     fn christoffel(x: &Point<Self>)
                    -> Tensor<Self, (ContravariantIndex, (CovariantIndex, CovariantIndex))> {
-        let u = x[0];
         let r = x[1];
         let th = x[2];
-        let ph = x[3];
         let m = M::mass();
         Tensor::<Self, (ContravariantIndex, (CovariantIndex, CovariantIndex))>::new(x.clone(),
                                                                                     arr![f64;
