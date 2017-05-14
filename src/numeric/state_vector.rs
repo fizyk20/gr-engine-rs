@@ -1,8 +1,17 @@
 use generic_array::{GenericArray, ArrayLength};
 use std::ops::{Add, Sub, Mul, Div};
 
-#[derive(Clone, Copy)]
-pub struct StateVector<N: ArrayLength<f64>>(GenericArray<f64, N>) where N::ArrayType: Copy;
+pub struct StateVector<N: ArrayLength<f64>>(GenericArray<f64, N>);
+
+impl<N: ArrayLength<f64>> Clone for StateVector<N>
+    where N::ArrayType: Clone
+{
+    fn clone(&self) -> Self {
+        StateVector(self.0.clone())
+    }
+}
+
+impl<N: ArrayLength<f64>> Copy for StateVector<N> where N::ArrayType: Copy {}
 
 impl<N: ArrayLength<f64>> Add<StateVector<N>> for StateVector<N>
     where N::ArrayType: Copy
