@@ -13,13 +13,14 @@ pub enum StepSize {
     Step(f64),
 }
 
-pub trait Integrator {
-    fn propagate<N, D>(&mut self,
-                       start: StateVector<N>,
-                       diff_eq: D,
-                       step: StepSize)
-                       -> StateVector<N>
-        where N: ArrayLength<f64>,
-              N::ArrayType: Copy,
-              D: DiffEq<N>;
+pub trait Integrator<N>
+    where N: ArrayLength<f64>,
+          N::ArrayType: Copy
+{
+    fn propagate<D>(&mut self,
+                    start: StateVector<N>,
+                    diff_eq: D,
+                    step: StepSize)
+                    -> StateVector<N>
+        where D: DiffEq<N>;
 }

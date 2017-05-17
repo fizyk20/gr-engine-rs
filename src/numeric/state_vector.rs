@@ -3,6 +3,12 @@ use std::ops::{Add, Sub, Mul, Div};
 
 pub struct StateVector<N: ArrayLength<f64>>(GenericArray<f64, N>);
 
+impl<N: ArrayLength<f64>> StateVector<N> {
+    pub fn abs(&self) -> f64 {
+        0.0
+    }
+}
+
 impl<N: ArrayLength<f64>> Clone for StateVector<N>
     where N::ArrayType: Clone
 {

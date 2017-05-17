@@ -9,17 +9,22 @@ impl RK4Integrator {
     pub fn new(step_size: f64) -> Self {
         RK4Integrator { default_step: step_size }
     }
+
+    pub fn set_default_step(&mut self, step: f64) {
+        self.default_step = step;
+    }
 }
 
-impl Integrator for RK4Integrator {
-    fn propagate<N, D>(&mut self,
-                       start: StateVector<N>,
-                       diff_eq: D,
-                       step_size: StepSize)
-                       -> StateVector<N>
-        where N: ArrayLength<f64>,
-              N::ArrayType: Copy,
-              D: DiffEq<N>
+impl<N> Integrator<N> for RK4Integrator
+    where N: ArrayLength<f64>,
+          N::ArrayType: Copy
+{
+    fn propagate<D>(&mut self,
+                    start: StateVector<N>,
+                    diff_eq: D,
+                    step_size: StepSize)
+                    -> StateVector<N>
+        where D: DiffEq<N>
     {
         let h = match step_size {
             StepSize::UseDefault => self.default_step,
