@@ -1,9 +1,9 @@
-use typenum::consts::U4;
+use super::Mass;
 use diffgeom::coordinates::{CoordinateSystem, Point};
 use diffgeom::metric::MetricSystem;
-use diffgeom::tensors::{CovariantIndex, ContravariantIndex, TwoForm, InvTwoForm, Tensor};
-use super::Mass;
+use diffgeom::tensors::{ContravariantIndex, CovariantIndex, InvTwoForm, Tensor, TwoForm};
 use std::marker::PhantomData;
+use typenum::consts::U4;
 
 pub struct EddingtonFinkelstein<M: Mass> {
     _m: PhantomData<M>,

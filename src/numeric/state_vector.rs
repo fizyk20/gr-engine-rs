@@ -2,7 +2,7 @@ use generic_array::{ArrayLength, GenericArray};
 use numeric_algs::{State, StateDerivative};
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-pub struct StateVector<N: ArrayLength<f64>>(GenericArray<f64, N>);
+pub struct StateVector<N: ArrayLength<f64>>(pub GenericArray<f64, N>);
 
 impl<N: ArrayLength<f64>> Clone for StateVector<N>
     where N::ArrayType: Clone
