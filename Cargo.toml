@@ -7,3 +7,4 @@ authors = ["Bartłomiej Kamiński <fizyk20@gmail.com>"]
 differential-geometry = { git = "https://github.com/fizyk20/differential-geometry.git", branch="master" }
 generic-array = "*"
 typenum = "*"
+numeric-algs = { git = "https://github.com/fizyk20/numeric-algs.git", branch="master" }

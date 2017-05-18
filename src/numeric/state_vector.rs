@@ -1,13 +1,8 @@
-use generic_array::{GenericArray, ArrayLength};
-use std::ops::{Add, Sub, Mul, Div};
+use generic_array::{ArrayLength, GenericArray};
+use numeric_algs::{State, StateDerivative};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub struct StateVector<N: ArrayLength<f64>>(GenericArray<f64, N>);
-
-impl<N: ArrayLength<f64>> StateVector<N> {
-    pub fn abs(&self) -> f64 {
-        0.0
-    }
-}
 
 impl<N: ArrayLength<f64>> Clone for StateVector<N>
     where N::ArrayType: Clone
@@ -81,5 +76,39 @@ impl<N: ArrayLength<f64>> Div<f64> for StateVector<N>
             self.0[i] /= other;
         }
         self
+    }
+}
+
+impl<N: ArrayLength<f64>> Neg for StateVector<N>
+    where N::ArrayType: Copy
+{
+    type Output = StateVector<N>;
+
+    fn neg(mut self) -> StateVector<N> {
+        for i in 0..N::to_usize() {
+            self.0[i] = -self.0[i];
+        }
+        self
+    }
+}
+
+impl<N: ArrayLength<f64>> StateDerivative for StateVector<N>
+    where N::ArrayType: Copy
+{
+    fn abs(&self) -> f64 {
+        let mut sum = 0.0;
+        for i in 0..N::to_usize() {
+            sum += self.0[i] * self.0[i];
+        }
+        sum.sqrt()
+    }
+}
+
+impl<N: ArrayLength<f64>> State for StateVector<N>
+    where N::ArrayType: Copy
+{
+    type Derivative = StateVector<N>;
+    fn shift(&self, dir: Self::Derivative, amount: f64) -> Self {
+        *self + dir * amount
     }
 }
