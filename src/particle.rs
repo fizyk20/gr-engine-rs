@@ -9,7 +9,7 @@ use std::ops::Mul;
 use typenum::{Exp, Pow, Prod, Unsigned};
 use typenum::consts::{U1, U2, U3};
 
-struct Particle<C: CoordinateSystem>
+pub struct Particle<C: CoordinateSystem>
     where C::Dimension: Pow<U1>,
           Exp<C::Dimension, U1>: ArrayLength<f64>
 {
@@ -26,6 +26,23 @@ impl<C: CoordinateSystem> Clone for Particle<C>
             x: self.x.clone(),
             v: self.v.clone(),
         }
+    }
+}
+
+impl<C: CoordinateSystem> Particle<C>
+    where C::Dimension: Pow<U1>,
+          Exp<C::Dimension, U1>: ArrayLength<f64>
+{
+    pub fn new(x: Point<C>, v: Vector<C>) -> Self {
+        Particle { x: x, v: v }
+    }
+
+    pub fn get_pos(&self) -> &Point<C> {
+        &self.x
+    }
+
+    pub fn get_vel(&self) -> &Vector<C> {
+        &self.v
     }
 }
 

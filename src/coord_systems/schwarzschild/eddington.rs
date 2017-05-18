@@ -45,17 +45,19 @@ impl<M: Mass> MetricSystem for EddingtonFinkelstein<M> {
         let r = x[1];
         let th = x[2];
         let m = M::mass();
+        let mr = m / r;
+        let r2m = r - 2.0 * m;
         Tensor::<Self, (ContravariantIndex, (CovariantIndex, CovariantIndex))>::new(x.clone(),
                                                                                     arr![f64;
-            m/r/r, 0.0, 0.0, 0.0,
+            mr/r, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, -r, 0.0,
             0.0, 0.0, 0.0, -r*th.sin()*th.sin(),
 
-            m*(1.0-2.0*m/r)/r/r, -m/r/r, 0.0, 0.0,
-            -m/r/r, 0.0, 0.0, 0.0,
-            0.0, 0.0, -(r-2.0*m), 0.0,
-            0.0, 0.0, 0.0, -(r-2.0*m)*th.sin()*th.sin(),
+            m*r2m/r/r/r, -mr/r, 0.0, 0.0,
+            -mr/r, 0.0, 0.0, 0.0,
+            0.0, 0.0, -r2m, 0.0,
+            0.0, 0.0, 0.0, -r2m*th.sin()*th.sin(),
 
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 1.0/r, 0.0,

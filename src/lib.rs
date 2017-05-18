@@ -3,11 +3,12 @@
 #![recursion_limit="70"]
 
 #[macro_use]
-extern crate generic_array;
-#[macro_use]
 extern crate diffgeom;
-extern crate typenum;
 extern crate numeric_algs;
+#[macro_use]
+extern crate generic_array;
+
+pub use generic_array::typenum;
 
 pub mod numeric;
 pub mod coord_systems;

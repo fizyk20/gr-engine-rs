@@ -1,12 +1,13 @@
 [package]
-name = "gr-engine"
+name = "shapiro"
 version = "0.1.0"
 authors = ["Bartłomiej Kamiński <fizyk20@gmail.com>"]
 
-[lib]
-name = "gr_engine"
-
 [dependencies]
+gr-engine = { path = "../.." }
 differential-geometry = "0.2.1"
 generic-array = "0.8.2"
 numeric-algs = "0.1.0"
+
+[profile.release]
+lto = true
