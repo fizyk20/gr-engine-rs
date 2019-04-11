@@ -5,7 +5,8 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 pub struct StateVector<N: ArrayLength<f64>>(pub GenericArray<f64, N>);
 
 impl<N: ArrayLength<f64>> Clone for StateVector<N>
-    where N::ArrayType: Clone
+where
+    N::ArrayType: Clone,
 {
     fn clone(&self) -> Self {
         StateVector(self.0.clone())
@@ -15,7 +16,8 @@ impl<N: ArrayLength<f64>> Clone for StateVector<N>
 impl<N: ArrayLength<f64>> Copy for StateVector<N> where N::ArrayType: Copy {}
 
 impl<N: ArrayLength<f64>> Add<StateVector<N>> for StateVector<N>
-    where N::ArrayType: Copy
+where
+    N::ArrayType: Copy,
 {
     type Output = StateVector<N>;
 
@@ -28,7 +30,8 @@ impl<N: ArrayLength<f64>> Add<StateVector<N>> for StateVector<N>
 }
 
 impl<N: ArrayLength<f64>> Sub<StateVector<N>> for StateVector<N>
-    where N::ArrayType: Copy
+where
+    N::ArrayType: Copy,
 {
     type Output = StateVector<N>;
 
@@ -41,7 +44,8 @@ impl<N: ArrayLength<f64>> Sub<StateVector<N>> for StateVector<N>
 }
 
 impl<N: ArrayLength<f64>> Mul<f64> for StateVector<N>
-    where N::ArrayType: Copy
+where
+    N::ArrayType: Copy,
 {
     type Output = StateVector<N>;
 
@@ -54,7 +58,8 @@ impl<N: ArrayLength<f64>> Mul<f64> for StateVector<N>
 }
 
 impl<N: ArrayLength<f64>> Mul<StateVector<N>> for f64
-    where N::ArrayType: Copy
+where
+    N::ArrayType: Copy,
 {
     type Output = StateVector<N>;
 
@@ -67,7 +72,8 @@ impl<N: ArrayLength<f64>> Mul<StateVector<N>> for f64
 }
 
 impl<N: ArrayLength<f64>> Div<f64> for StateVector<N>
-    where N::ArrayType: Copy
+where
+    N::ArrayType: Copy,
 {
     type Output = StateVector<N>;
 
@@ -80,7 +86,8 @@ impl<N: ArrayLength<f64>> Div<f64> for StateVector<N>
 }
 
 impl<N: ArrayLength<f64>> Neg for StateVector<N>
-    where N::ArrayType: Copy
+where
+    N::ArrayType: Copy,
 {
     type Output = StateVector<N>;
 
@@ -93,7 +100,8 @@ impl<N: ArrayLength<f64>> Neg for StateVector<N>
 }
 
 impl<N: ArrayLength<f64>> StateDerivative for StateVector<N>
-    where N::ArrayType: Copy
+where
+    N::ArrayType: Copy,
 {
     fn abs(&self) -> f64 {
         let mut sum = 0.0;
@@ -105,7 +113,8 @@ impl<N: ArrayLength<f64>> StateDerivative for StateVector<N>
 }
 
 impl<N: ArrayLength<f64>> State for StateVector<N>
-    where N::ArrayType: Copy
+where
+    N::ArrayType: Copy,
 {
     type Derivative = StateVector<N>;
     fn shift(&self, dir: Self::Derivative, amount: f64) -> Self {

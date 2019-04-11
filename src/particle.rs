@@ -3,23 +3,25 @@ use diffgeom::metric::MetricSystem;
 use diffgeom::tensors::Vector;
 use generic_array::{ArrayLength, GenericArray};
 use numeric::StateVector;
-use numeric_algs::State;
 use numeric_algs::integration::DiffEq;
+use numeric_algs::State;
 use std::ops::Mul;
-use typenum::{Exp, Pow, Prod, Unsigned};
 use typenum::consts::{U1, U2, U3};
+use typenum::{Exp, Pow, Prod, Unsigned};
 
 pub struct Particle<C: CoordinateSystem>
-    where C::Dimension: Pow<U1>,
-          Exp<C::Dimension, U1>: ArrayLength<f64>
+where
+    C::Dimension: Pow<U1>,
+    Exp<C::Dimension, U1>: ArrayLength<f64>,
 {
     x: Point<C>,
     v: Vector<C>,
 }
 
 impl<C: CoordinateSystem> Clone for Particle<C>
-    where C::Dimension: Pow<U1>,
-          Exp<C::Dimension, U1>: ArrayLength<f64>
+where
+    C::Dimension: Pow<U1>,
+    Exp<C::Dimension, U1>: ArrayLength<f64>,
 {
     fn clone(&self) -> Self {
         Particle {
@@ -30,8 +32,9 @@ impl<C: CoordinateSystem> Clone for Particle<C>
 }
 
 impl<C: CoordinateSystem> Particle<C>
-    where C::Dimension: Pow<U1>,
-          Exp<C::Dimension, U1>: ArrayLength<f64>
+where
+    C::Dimension: Pow<U1>,
+    Exp<C::Dimension, U1>: ArrayLength<f64>,
 {
     pub fn new(x: Point<C>, v: Vector<C>) -> Self {
         Particle { x: x, v: v }
@@ -47,10 +50,11 @@ impl<C: CoordinateSystem> Particle<C>
 }
 
 impl<C: CoordinateSystem> State for Particle<C>
-    where C::Dimension: Pow<U1> + Mul<U2> + Unsigned,
-          Exp<C::Dimension, U1>: ArrayLength<f64>,
-          Prod<C::Dimension, U2>: ArrayLength<f64>,
-          <Prod<C::Dimension, U2> as ArrayLength<f64>>::ArrayType: Copy
+where
+    C::Dimension: Pow<U1> + Mul<U2> + Unsigned,
+    Exp<C::Dimension, U1>: ArrayLength<f64>,
+    Prod<C::Dimension, U2>: ArrayLength<f64>,
+    <Prod<C::Dimension, U2> as ArrayLength<f64>>::ArrayType: Copy,
 {
     type Derivative = StateVector<Prod<C::Dimension, U2>>;
 
@@ -69,13 +73,14 @@ impl<C: CoordinateSystem> State for Particle<C>
 }
 
 impl<C: CoordinateSystem> DiffEq<Particle<C>> for Particle<C>
-    where C::Dimension: Pow<U1> + Mul<U2> + Unsigned + Pow<U2> + Pow<U3>,
-          Exp<C::Dimension, U1>: ArrayLength<f64>,
-          Prod<C::Dimension, U2>: ArrayLength<f64>,
-          <Prod<C::Dimension, U2> as ArrayLength<f64>>::ArrayType: Copy,
-          C: MetricSystem,
-          Exp<C::Dimension, U2>: ArrayLength<f64>,
-          Exp<C::Dimension, U3>: ArrayLength<f64>
+where
+    C::Dimension: Pow<U1> + Mul<U2> + Unsigned + Pow<U2> + Pow<U3>,
+    Exp<C::Dimension, U1>: ArrayLength<f64>,
+    Prod<C::Dimension, U2>: ArrayLength<f64>,
+    <Prod<C::Dimension, U2> as ArrayLength<f64>>::ArrayType: Copy,
+    C: MetricSystem,
+    Exp<C::Dimension, U2>: ArrayLength<f64>,
+    Exp<C::Dimension, U3>: ArrayLength<f64>,
 {
     fn derivative(&self, state: Particle<C>) -> StateVector<Prod<C::Dimension, U2>> {
         let christoffel = C::christoffel(&state.x);
