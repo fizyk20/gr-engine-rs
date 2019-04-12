@@ -1,16 +1,15 @@
-extern crate gr_engine;
 extern crate diffgeom;
+extern crate gr_engine;
 #[macro_use]
 extern crate generic_array;
 extern crate numeric_algs;
 
-use diffgeom::coordinates::{CoordinateSystem, Point};
-use diffgeom::metric::MetricSystem;
+use diffgeom::coordinates::Point;
 use diffgeom::tensors::Vector;
 use gr_engine::coord_systems::schwarzschild::{EddingtonFinkelstein, Mass};
 use gr_engine::numeric::StateVector;
 use gr_engine::particle::Particle;
-use numeric_algs::integration::{DPIntegrator, DiffEq, Integrator, StepSize};
+use numeric_algs::integration::{DPIntegrator, Integrator, StepSize};
 use std::f64::consts::PI;
 
 struct Sun;
@@ -37,8 +36,8 @@ fn t(u: f64, r: f64) -> f64 {
 
 fn main() {
     let u0 = (D * D * D / (D - M * 2.0)).sqrt();
-    let rE = (D * D + YE * YE).sqrt();
-    let rV = (D * D + YV * YV).sqrt();
+    let r_e = (D * D + YE * YE).sqrt();
+    let r_v = (D * D + YV * YV).sqrt();
 
     let t_flat = 2.0 * (YE + YV);
 
@@ -49,34 +48,44 @@ fn main() {
     let mut photon1 = Particle::new(start_point.clone(), u_init1);
     let mut photon2 = Particle::new(start_point.clone(), u_init2);
 
-    let mut integrator1 = DPIntegrator::<Particle<Coords>>::new(1e-12, 0.01, 0.0001, 0.1);
-    let mut integrator2 = DPIntegrator::<Particle<Coords>>::new(1e-12, 0.01, 0.0001, 0.1);
+    let mut integrator1 = DPIntegrator::<Particle<Coords>>::new(0.01, 0.0001, 0.1, 1e-12);
+    let mut integrator2 = DPIntegrator::<Particle<Coords>>::new(0.01, 0.0001, 0.1, 1e-12);
 
     let mut last_pos = photon1.get_pos().clone();
     println!("Propagating the first photon...");
 
-    while photon1.get_pos()[1] < rE {
+    let mut i = 1;
+    while photon1.get_pos()[1] < r_e {
         last_pos = photon1.get_pos().clone();
-        photon1 = integrator1.propagate(photon1.clone(), photon1, StepSize::UseDefault);
+        integrator1.propagate_in_place(&mut photon1, Particle::derivative, StepSize::UseDefault);
+        i += 1;
+        if i % 100 == 0 {
+            println!("Iteration {}... r = {}", i, photon1.get_pos()[1]);
+        }
     }
     let pos = photon1.get_pos().clone();
     let pos = StateVector(arr![f64; pos[0], pos[1], pos[2], pos[3]]);
     let last_pos = StateVector(arr![f64; last_pos[0], last_pos[1], last_pos[2], last_pos[3]]);
-    let coeff = (rE - last_pos.0[1]) / (pos.0[1] - last_pos.0[1]);
+    let coeff = (r_e - last_pos.0[1]) / (pos.0[1] - last_pos.0[1]);
     let last_pos = last_pos + (pos - last_pos) * coeff;
     let t1 = t(last_pos.0[0], last_pos.0[1]);
 
     let mut last_pos = photon2.get_pos().clone();
     println!("Propagating the second photon...");
 
-    while photon2.get_pos()[1] < rV {
+    let mut i = 1;
+    while photon2.get_pos()[1] < r_v {
         last_pos = photon2.get_pos().clone();
-        photon2 = integrator2.propagate(photon2.clone(), photon2, StepSize::UseDefault);
+        integrator2.propagate_in_place(&mut photon2, Particle::derivative, StepSize::UseDefault);
+        i += 1;
+        if i % 100 == 0 {
+            println!("Iteration {}... r = {}", i, photon2.get_pos()[1]);
+        }
     }
     let pos = photon2.get_pos().clone();
     let pos = StateVector(arr![f64; pos[0], pos[1], pos[2], pos[3]]);
     let last_pos = StateVector(arr![f64; last_pos[0], last_pos[1], last_pos[2], last_pos[3]]);
-    let coeff = (rV - last_pos.0[1]) / (pos.0[1] - last_pos.0[1]);
+    let coeff = (r_v - last_pos.0[1]) / (pos.0[1] - last_pos.0[1]);
     let last_pos = last_pos + (pos - last_pos) * coeff;
     let t2 = t(last_pos.0[0], last_pos.0[1]);
 
@@ -84,7 +93,7 @@ fn main() {
     println!("t1 = {}", t1);
     println!("t2 = {}", t2);
 
-    let dt = (t1 - t2) * 2.0 * (1.0 - 2.0 * M / rE).sqrt();
+    let dt = (t1 - t2) * 2.0 * (1.0 - 2.0 * M / r_e).sqrt();
     println!("dt = {}", dt);
     println!("delay = {}", dt - t_flat);
 }
