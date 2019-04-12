@@ -3,7 +3,6 @@ use diffgeom::metric::MetricSystem;
 use diffgeom::tensors::Vector;
 use generic_array::{ArrayLength, GenericArray};
 use numeric::StateVector;
-use numeric_algs::integration::DiffEq;
 use numeric_algs::State;
 use std::ops::Mul;
 use typenum::consts::{U1, U2, U3};
@@ -58,21 +57,17 @@ where
 {
     type Derivative = StateVector<Prod<C::Dimension, U2>>;
 
-    fn shift(&self, dir: Self::Derivative, amount: f64) -> Self {
+    fn shift_in_place(&mut self, dir: &Self::Derivative, amount: f64) {
         let d = C::Dimension::to_usize();
-        let mut new_x = GenericArray::default();
-        let mut new_v = GenericArray::default();
         for i in 0..d {
-            new_x[i] = self.x[i] + dir.0[i] * amount;
-            new_v[i] = self.v[i] + dir.0[i + d] * amount;
+            self.x[i] += dir.0[i] * amount;
+            self.v[i] += dir.0[i + d] * amount;
+            self.v.set_point(self.x.clone());
         }
-        let x = Point::new(new_x);
-        let v = Vector::new(x.clone(), new_v);
-        Particle { x: x, v: v }
     }
 }
 
-impl<C: CoordinateSystem> DiffEq<Particle<C>> for Particle<C>
+impl<C: CoordinateSystem> Particle<C>
 where
     C::Dimension: Pow<U1> + Mul<U2> + Unsigned + Pow<U2> + Pow<U3>,
     Exp<C::Dimension, U1>: ArrayLength<f64>,
@@ -82,14 +77,14 @@ where
     Exp<C::Dimension, U2>: ArrayLength<f64>,
     Exp<C::Dimension, U3>: ArrayLength<f64>,
 {
-    fn derivative(&self, state: Particle<C>) -> StateVector<Prod<C::Dimension, U2>> {
-        let christoffel = C::christoffel(&state.x);
-        let temp = inner!(_, Vector<C>; U1, U3; christoffel, state.v.clone());
-        let cov_der = inner!(_, Vector<C>; U1, U2; temp, state.v.clone());
+    pub fn derivative(&self) -> StateVector<Prod<C::Dimension, U2>> {
+        let christoffel = C::christoffel(&self.x);
+        let temp = inner!(_, Vector<C>; U1, U3; christoffel, self.v.clone());
+        let cov_der = inner!(_, Vector<C>; U1, U2; temp, self.v.clone());
         let mut result = GenericArray::default();
         let d = C::Dimension::to_usize();
         for i in 0..d {
-            result[i] = state.v[i];
+            result[i] = self.v[i];
             result[i + d] = -cov_der[i];
         }
         StateVector(result)

@@ -1,6 +1,6 @@
 use generic_array::{ArrayLength, GenericArray};
 use numeric_algs::{State, StateDerivative};
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 pub struct StateVector<N: ArrayLength<f64>>(pub GenericArray<f64, N>);
 
@@ -29,6 +29,17 @@ where
     }
 }
 
+impl<N: ArrayLength<f64>> AddAssign<StateVector<N>> for StateVector<N>
+where
+    N::ArrayType: Copy,
+{
+    fn add_assign(&mut self, other: StateVector<N>) {
+        for i in 0..N::to_usize() {
+            self.0[i] += other.0[i];
+        }
+    }
+}
+
 impl<N: ArrayLength<f64>> Sub<StateVector<N>> for StateVector<N>
 where
     N::ArrayType: Copy,
@@ -40,6 +51,17 @@ where
             self.0[i] -= other.0[i];
         }
         self
+    }
+}
+
+impl<N: ArrayLength<f64>> SubAssign<StateVector<N>> for StateVector<N>
+where
+    N::ArrayType: Copy,
+{
+    fn sub_assign(&mut self, other: StateVector<N>) {
+        for i in 0..N::to_usize() {
+            self.0[i] -= other.0[i];
+        }
     }
 }
 
@@ -117,7 +139,7 @@ where
     N::ArrayType: Copy,
 {
     type Derivative = StateVector<N>;
-    fn shift(&self, dir: Self::Derivative, amount: f64) -> Self {
-        *self + dir * amount
+    fn shift_in_place(&mut self, dir: &Self::Derivative, amount: f64) {
+        *self += *dir * amount;
     }
 }
