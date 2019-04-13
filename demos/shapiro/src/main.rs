@@ -42,7 +42,7 @@ fn propagate_single_photon(
         }
     }
 
-    let pos = photon.get_pos().clone();
+    let pos = photon.get_pos();
     let (t, r) = (pos[0], pos[1]);
     let (last_t, last_r) = (last_pos[0], last_pos[1]);
 
