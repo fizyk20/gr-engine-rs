@@ -7,7 +7,6 @@ extern crate numeric_algs;
 use diffgeom::coordinates::Point;
 use diffgeom::tensors::Vector;
 use gr_engine::coord_systems::schwarzschild::{Mass, Schwarzschild};
-use gr_engine::numeric::StateVector;
 use gr_engine::particle::Particle;
 use numeric_algs::integration::{DPIntegrator, Integrator, StepSize};
 use std::f64::consts::PI;
@@ -26,6 +25,32 @@ const D: f64 = 2.33; // radius of the Sun in seconds
 const YE: f64 = 498.67; // Earth "y" coordinate in seconds
 const YV: f64 = 370.7; // Venus "y" coordinate in seconds
 
+fn propagate_single_photon(
+    photon: &mut Particle<Coords>,
+    integrator: &mut DPIntegrator<Particle<Coords>>,
+    r_max: f64,
+) -> f64 {
+    let mut last_pos = photon.get_pos().clone();
+
+    let mut i = 1;
+    while photon.get_pos()[1] < r_max {
+        last_pos = photon.get_pos().clone();
+        integrator.propagate_in_place(photon, Particle::derivative, StepSize::UseDefault);
+        i += 1;
+        if i % 100 == 0 {
+            println!("Iteration {}... r = {}", i, photon.get_pos()[1]);
+        }
+    }
+
+    let pos = photon.get_pos().clone();
+    let (t, r) = (pos[0], pos[1]);
+    let (last_t, last_r) = (last_pos[0], last_pos[1]);
+
+    let coeff = (r_max - last_r) / (r - last_r);
+
+    last_t + (t - last_t) * coeff
+}
+
 fn main() {
     let u0 = (D * D * D / (D - M * 2.0)).sqrt();
     let r_e = (D * D + YE * YE).sqrt();
@@ -40,46 +65,15 @@ fn main() {
     let mut photon1 = Particle::new(start_point.clone(), u_init1);
     let mut photon2 = Particle::new(start_point.clone(), u_init2);
 
-    let mut integrator1 = DPIntegrator::<Particle<Coords>>::new(0.01, 0.0001, 0.1, 1e-12);
-    let mut integrator2 = DPIntegrator::<Particle<Coords>>::new(0.01, 0.0001, 0.1, 1e-12);
+    let mut integrator = DPIntegrator::<Particle<Coords>>::new(0.01, 0.0001, 0.1, 1e-12);
 
-    let mut last_pos = photon1.get_pos().clone();
     println!("Propagating the first photon...");
+    let t1 = propagate_single_photon(&mut photon1, &mut integrator, r_e);
 
-    let mut i = 1;
-    while photon1.get_pos()[1] < r_e {
-        last_pos = photon1.get_pos().clone();
-        integrator1.propagate_in_place(&mut photon1, Particle::derivative, StepSize::UseDefault);
-        i += 1;
-        if i % 100 == 0 {
-            println!("Iteration {}... r = {}", i, photon1.get_pos()[1]);
-        }
-    }
-    let pos = photon1.get_pos().clone();
-    let pos = StateVector(arr![f64; pos[0], pos[1], pos[2], pos[3]]);
-    let last_pos = StateVector(arr![f64; last_pos[0], last_pos[1], last_pos[2], last_pos[3]]);
-    let coeff = (r_e - last_pos.0[1]) / (pos.0[1] - last_pos.0[1]);
-    let last_pos = last_pos + (pos - last_pos) * coeff;
-    let t1 = last_pos.0[0];
+    integrator.reset();
 
-    let mut last_pos = photon2.get_pos().clone();
     println!("Propagating the second photon...");
-
-    let mut i = 1;
-    while photon2.get_pos()[1] < r_v {
-        last_pos = photon2.get_pos().clone();
-        integrator2.propagate_in_place(&mut photon2, Particle::derivative, StepSize::UseDefault);
-        i += 1;
-        if i % 100 == 0 {
-            println!("Iteration {}... r = {}", i, photon2.get_pos()[1]);
-        }
-    }
-    let pos = photon2.get_pos().clone();
-    let pos = StateVector(arr![f64; pos[0], pos[1], pos[2], pos[3]]);
-    let last_pos = StateVector(arr![f64; last_pos[0], last_pos[1], last_pos[2], last_pos[3]]);
-    let coeff = (r_v - last_pos.0[1]) / (pos.0[1] - last_pos.0[1]);
-    let last_pos = last_pos + (pos - last_pos) * coeff;
-    let t2 = last_pos.0[0];
+    let t2 = propagate_single_photon(&mut photon2, &mut integrator, r_v);
 
     println!("Propagation finished.");
     println!("t1 = {}", t1);
