@@ -6,7 +6,7 @@ extern crate numeric_algs;
 
 use diffgeom::coordinates::Point;
 use diffgeom::tensors::Vector;
-use gr_engine::coord_systems::schwarzschild::{EddingtonFinkelstein, Mass};
+use gr_engine::coord_systems::schwarzschild::{Mass, Schwarzschild};
 use gr_engine::numeric::StateVector;
 use gr_engine::particle::Particle;
 use numeric_algs::integration::{DPIntegrator, Integrator, StepSize};
@@ -19,20 +19,12 @@ impl Mass for Sun {
     }
 }
 
-type Coords = EddingtonFinkelstein<Sun>;
+type Coords = Schwarzschild<Sun>;
 
 const M: f64 = 4.9e-6; // mass of the Sun in seconds, with c = G = 1
 const D: f64 = 2.33; // radius of the Sun in seconds
 const YE: f64 = 498.67; // Earth "y" coordinate in seconds
 const YV: f64 = 370.7; // Venus "y" coordinate in seconds
-
-fn u(t: f64, r: f64) -> f64 {
-    t + r + (0.5 * (r - 2.0 * M) / M).ln() * 2.0 * M
-}
-
-fn t(u: f64, r: f64) -> f64 {
-    u - r - (0.5 * (r - 2.0 * M) / M).ln() * 2.0 * M
-}
 
 fn main() {
     let u0 = (D * D * D / (D - M * 2.0)).sqrt();
@@ -41,7 +33,7 @@ fn main() {
 
     let t_flat = 2.0 * (YE + YV);
 
-    let start_point = Point::<Coords>::new(arr![f64; u(0.0, D), D, PI / 2.0, 0.0]);
+    let start_point = Point::<Coords>::new(arr![f64; 0.0, D, PI / 2.0, 0.0]);
     let u_init1 = Vector::<Coords>::new(start_point.clone(), arr![f64; u0, 0.0, 0.0, 1.0]);
     let u_init2 = Vector::<Coords>::new(start_point.clone(), arr![f64; -u0, 0.0, 0.0, -1.0]);
 
@@ -68,7 +60,7 @@ fn main() {
     let last_pos = StateVector(arr![f64; last_pos[0], last_pos[1], last_pos[2], last_pos[3]]);
     let coeff = (r_e - last_pos.0[1]) / (pos.0[1] - last_pos.0[1]);
     let last_pos = last_pos + (pos - last_pos) * coeff;
-    let t1 = t(last_pos.0[0], last_pos.0[1]);
+    let t1 = last_pos.0[0];
 
     let mut last_pos = photon2.get_pos().clone();
     println!("Propagating the second photon...");
@@ -87,7 +79,7 @@ fn main() {
     let last_pos = StateVector(arr![f64; last_pos[0], last_pos[1], last_pos[2], last_pos[3]]);
     let coeff = (r_v - last_pos.0[1]) / (pos.0[1] - last_pos.0[1]);
     let last_pos = last_pos + (pos - last_pos) * coeff;
-    let t2 = t(last_pos.0[0], last_pos.0[1]);
+    let t2 = last_pos.0[0];
 
     println!("Propagation finished.");
     println!("t1 = {}", t1);
