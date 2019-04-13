@@ -8,3 +8,4 @@ pub trait Mass {
 }
 
 pub use self::eddington::EddingtonFinkelstein;
+pub use self::schwarzschild::Schwarzschild;
