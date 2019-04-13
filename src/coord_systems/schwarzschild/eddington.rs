@@ -1,7 +1,7 @@
-use super::Mass;
-use diffgeom::coordinates::{CoordinateSystem, Point};
+use super::{Mass, Schwarzschild};
+use diffgeom::coordinates::{ConversionTo, CoordinateSystem, Point};
 use diffgeom::metric::MetricSystem;
-use diffgeom::tensors::{ContravariantIndex, CovariantIndex, InvTwoForm, Tensor, TwoForm};
+use diffgeom::tensors::{ContravariantIndex, CovariantIndex, InvTwoForm, Matrix, Tensor, TwoForm};
 use std::marker::PhantomData;
 use typenum::consts::U4;
 
@@ -81,4 +81,48 @@ impl<M: Mass> MetricSystem for EddingtonFinkelstein<M> {
     // TODO
     //fn dg(x: &Point<Self>) -> Tensor<Self, (CovariantIndex, (CovariantIndex, CovariantIndex))>
     //fn covariant_christoffel(x: &Point<Self>) -> Tensor<Self, (CovariantIndex, (CovariantIndex, CovariantIndex))>
+}
+
+// Conversions
+
+impl<M: Mass + 'static> ConversionTo<Schwarzschild<M>> for EddingtonFinkelstein<M> {
+    fn convert_point(p: &Point<Self>) -> Point<Schwarzschild<M>> {
+        let u = p[0];
+        let r = p[1];
+        let m = M::mass();
+        let t = u - r - (0.5 * (r - 2.0 * m) / m).ln() * 2.0 * m;
+        Point::new(arr![f64; t, r, p[2], p[3]])
+    }
+
+    fn jacobian(p: &Point<Self>) -> Matrix<Schwarzschild<M>> {
+        let r = p[1];
+        let m = M::mass();
+        let dtdr = -r / (r - 2.0 * m);
+        Matrix::new(
+            Self::convert_point(p),
+            arr![f64;
+                        1.0, dtdr, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0,
+                        0.0, 0.0, 1.0, 0.0,
+                        0.0, 0.0, 0.0, 1.0,
+            ],
+        )
+    }
+
+    fn inv_jacobian(
+        p: &Point<Self>,
+    ) -> Tensor<Schwarzschild<M>, (CovariantIndex, ContravariantIndex)> {
+        let r = p[1];
+        let m = M::mass();
+        let dtdr = -r / (r - 2.0 * m);
+        Tensor::<Schwarzschild<M>, (CovariantIndex, ContravariantIndex)>::new(
+            Self::convert_point(p),
+            arr![f64;
+                        1.0, -dtdr, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0,
+                        0.0, 0.0, 1.0, 0.0,
+                        0.0, 0.0, 0.0, 1.0,
+            ],
+        )
+    }
 }
