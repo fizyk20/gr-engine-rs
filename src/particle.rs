@@ -1,4 +1,4 @@
-use diffgeom::coordinates::{CoordinateSystem, Point};
+use diffgeom::coordinates::{ConversionTo, CoordinateSystem, Point};
 use diffgeom::metric::MetricSystem;
 use diffgeom::tensors::Vector;
 use generic_array::{ArrayLength, GenericArray};
@@ -6,7 +6,7 @@ use numeric::StateVector;
 use numeric_algs::State;
 use std::ops::Mul;
 use typenum::consts::{U1, U2, U3};
-use typenum::{Exp, Pow, Prod, Unsigned};
+use typenum::{Exp, Pow, Prod, Same, Unsigned};
 
 pub struct Particle<C: CoordinateSystem>
 where
@@ -88,5 +88,24 @@ where
             result[i + d] = -cov_der[i];
         }
         StateVector(result)
+    }
+}
+
+impl<C: CoordinateSystem> Particle<C>
+where
+    C::Dimension: Pow<U1>,
+    Exp<C::Dimension, U1>: ArrayLength<f64>,
+{
+    pub fn convert<C2: CoordinateSystem + 'static>(&self) -> Particle<C2>
+    where
+        C: ConversionTo<C2>,
+        C2::Dimension: Pow<U1> + Pow<U2>,
+        Exp<C2::Dimension, U1>: ArrayLength<f64>,
+        Exp<C2::Dimension, U2>: ArrayLength<f64>,
+        C2::Dimension: Same<C::Dimension>,
+    {
+        let new_x: Point<C2> = C::convert_point(&self.x);
+        let new_v: Vector<C2> = self.v.convert();
+        Particle { x: new_x, v: new_v }
     }
 }
