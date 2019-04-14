@@ -109,3 +109,25 @@ where
         Particle { x: new_x, v: new_v }
     }
 }
+
+pub trait PosAndVel<D: Unsigned + ArrayLength<f64> + Pow<U1>>
+where
+    Exp<D, U1>: ArrayLength<f64>,
+{
+    fn get_pos(&self) -> &GenericArray<f64, D>;
+    fn get_vel(&self) -> &GenericArray<f64, Exp<D, U1>>;
+}
+
+impl<C: CoordinateSystem> PosAndVel<C::Dimension> for Particle<C>
+where
+    C::Dimension: Pow<U1>,
+    Exp<C::Dimension, U1>: ArrayLength<f64>,
+{
+    fn get_pos(&self) -> &GenericArray<f64, C::Dimension> {
+        self.x.coords_array()
+    }
+
+    fn get_vel(&self) -> &GenericArray<f64, Exp<C::Dimension, U1>> {
+        self.v.coords_array()
+    }
+}
