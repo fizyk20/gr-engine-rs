@@ -9,4 +9,5 @@ pub trait Mass {
 
 pub use self::eddington::EddingtonFinkelstein;
 pub use self::polar_eddington::{NearPole0EF, NearPolePiEF};
+pub use self::polar_schwarzschild::{NearPole0Schw, NearPolePiSchw};
 pub use self::schwarzschild::Schwarzschild;
