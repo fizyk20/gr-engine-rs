@@ -23,7 +23,7 @@ impl<M: Mass> MetricSystem for Schwarzschild<M> {
             x.clone(),
             arr![f64;
                 coeff, 0.0, 0.0, 0.0,
-                0.0, 1.0/coeff, 0.0, 0.0,
+                0.0, -1.0/coeff, 0.0, 0.0,
                 0.0, 0.0, -r*r, 0.0,
                 0.0, 0.0, 0.0, -r*r*th.sin()*th.sin()
             ],
@@ -39,7 +39,7 @@ impl<M: Mass> MetricSystem for Schwarzschild<M> {
             x.clone(),
             arr![f64;
                 1.0 / coeff, 0.0, 0.0, 0.0,
-                0.0, coeff, 0.0, 0.0,
+                0.0, -coeff, 0.0, 0.0,
                 0.0, 0.0, -1.0/(r*r), 0.0,
                 0.0, 0.0, 0.0, -1.0/(r*r*th.sin()*th.sin())
             ],
