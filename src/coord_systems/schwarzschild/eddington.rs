@@ -101,10 +101,10 @@ impl<M: Mass + 'static> ConversionTo<Schwarzschild<M>> for EddingtonFinkelstein<
         Matrix::new(
             Self::convert_point(p),
             arr![f64;
-                        1.0, dtdr, 0.0, 0.0,
-                        0.0, 1.0, 0.0, 0.0,
-                        0.0, 0.0, 1.0, 0.0,
-                        0.0, 0.0, 0.0, 1.0,
+                1.0, dtdr, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0,
             ],
         )
     }
@@ -118,10 +118,10 @@ impl<M: Mass + 'static> ConversionTo<Schwarzschild<M>> for EddingtonFinkelstein<
         Tensor::<Schwarzschild<M>, (CovariantIndex, ContravariantIndex)>::new(
             Self::convert_point(p),
             arr![f64;
-                        1.0, -dtdr, 0.0, 0.0,
-                        0.0, 1.0, 0.0, 0.0,
-                        0.0, 0.0, 1.0, 0.0,
-                        0.0, 0.0, 0.0, 1.0,
+                1.0, -dtdr, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0,
             ],
         )
     }
