@@ -1,12 +1,13 @@
+use crate::numeric::StateVector;
+use crate::typenum::consts::{U1, U2, U3};
+use crate::typenum::{Exp, Pow, Prod, Same, Unsigned};
 use diffgeom::coordinates::{ConversionTo, CoordinateSystem, Point};
+use diffgeom::inner;
 use diffgeom::metric::MetricSystem;
 use diffgeom::tensors::Vector;
 use generic_array::{ArrayLength, GenericArray};
-use numeric::StateVector;
 use numeric_algs::State;
 use std::ops::Mul;
-use typenum::consts::{U1, U2, U3};
-use typenum::{Exp, Pow, Prod, Same, Unsigned};
 
 pub struct Particle<C: CoordinateSystem>
 where

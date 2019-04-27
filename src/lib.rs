@@ -2,11 +2,9 @@
 // (64 numbers in a 4D spacetime)
 #![recursion_limit = "70"]
 
-#[macro_use]
 pub extern crate diffgeom;
-extern crate numeric_algs;
-#[macro_use]
 pub extern crate generic_array;
+extern crate numeric_algs;
 
 pub use generic_array::typenum;
 

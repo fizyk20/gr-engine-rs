@@ -1,10 +1,11 @@
 use super::{EddingtonFinkelstein, Mass, NearPole0Schw, NearPolePiSchw};
+use crate::typenum::consts::U4;
 use diffgeom::coordinates::{ConversionTo, CoordinateSystem, Point};
 use diffgeom::metric::MetricSystem;
 use diffgeom::tensors::{ContravariantIndex, CovariantIndex, InvTwoForm, Matrix, Tensor, TwoForm};
+use generic_array::arr;
 use std::f64::consts::PI;
 use std::marker::PhantomData;
-use typenum::consts::U4;
 
 pub struct Schwarzschild<M: Mass> {
     _m: PhantomData<M>,

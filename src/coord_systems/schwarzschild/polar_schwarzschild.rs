@@ -1,10 +1,11 @@
 use super::{Mass, Schwarzschild};
+use crate::typenum::consts::U4;
 use diffgeom::coordinates::{ConversionTo, CoordinateSystem, Point};
 use diffgeom::metric::MetricSystem;
 use diffgeom::tensors::{ContravariantIndex, CovariantIndex, InvTwoForm, Matrix, Tensor, TwoForm};
+use generic_array::arr;
 use std::f64::consts::PI;
 use std::marker::PhantomData;
-use typenum::consts::U4;
 
 /// The coordinate system near the pole theta=pi
 pub struct NearPole0Schw<M: Mass> {
