@@ -3,10 +3,10 @@
 #![recursion_limit = "70"]
 
 #[macro_use]
-extern crate diffgeom;
+pub extern crate diffgeom;
 extern crate numeric_algs;
 #[macro_use]
-extern crate generic_array;
+pub extern crate generic_array;
 
 pub use generic_array::typenum;
 

@@ -7,6 +7,6 @@ authors = ["Bartłomiej Kamiński <fizyk20@gmail.com>"]
 name = "gr_engine"
 
 [dependencies]
-differential-geometry = "0.2.2"
-generic-array = "0.12"
+differential-geometry = "0.3"
+generic-array = "0.13"
 numeric-algs = "0.2.1"
