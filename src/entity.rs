@@ -14,8 +14,18 @@ where
     C::Dimension: Pow<U1>,
     Exp<C::Dimension, U1>: ArrayLength<f64>,
 {
+    // position
     x: Point<C>,
+    // the local basis of spacetime; the vectors represent:
+    // 0: 4-velocity
+    // 1: the forward direction
+    // 2: the right direction
+    // 3: the up direction
     dirs: [Vector<C>; 4],
+    // applied force in local coordinates
+    force: [f64; 3],
+    // angular velocity in local coordinates
+    ang_vel: [f64; 3],
 }
 
 impl<C: CoordinateSystem> Clone for Entity<C>
@@ -27,6 +37,8 @@ where
         Entity {
             x: self.x.clone(),
             dirs: self.dirs.clone(),
+            force: self.force,
+            ang_vel: self.ang_vel,
         }
     }
 }
@@ -46,6 +58,8 @@ where
         Entity {
             x: x,
             dirs: [v, local_x, local_y, local_z],
+            force: [0.0; 3],
+            ang_vel: [0.0; 3],
         }
     }
 
@@ -71,12 +85,51 @@ where
         }
     }
 
+    pub fn add_force(&mut self, x: f64, y: f64, z: f64) {
+        self.force[0] += x;
+        self.force[1] += y;
+        self.force[2] += z;
+    }
+
+    pub fn add_ang_vel(&mut self, x: f64, y: f64, z: f64) {
+        self.ang_vel[0] += x;
+        self.ang_vel[1] += y;
+        self.ang_vel[2] += z;
+    }
+
+    pub fn reset_force(&mut self) {
+        self.force = [0.0; 3];
+    }
+
+    pub fn reset_ang_vel(&mut self) {
+        self.ang_vel = [0.0; 3];
+    }
+
     pub fn get_pos(&self) -> &Point<C> {
         &self.x
     }
 
     pub fn get_vel(&self) -> &Vector<C> {
         &self.dirs[0]
+    }
+
+    // calculates the covariant derivative of the selected component of the local basis in the
+    // direction of 4-velocity
+    fn calculate_derivative(&self, dir: usize) -> Vector<C> {
+        let gen_matrix = [
+            [0.0, self.force[0], self.force[1], self.force[2]],
+            [self.force[0], 0.0, -self.ang_vel[2], self.ang_vel[1]],
+            [self.force[1], self.ang_vel[2], 0.0, -self.ang_vel[0]],
+            [self.force[2], -self.ang_vel[1], self.ang_vel[0], 0.0],
+        ];
+
+        let mut result = Vector::zero(self.x.clone());
+
+        for i in 0..4 {
+            result += gen_matrix[i][dir] * self.dirs[i].clone();
+        }
+
+        result
     }
 }
 
@@ -119,9 +172,11 @@ where
 
         // derivative of directions
         for j in 0..4 {
-            let cov_der = inner!(_, Vector<C>; U1, U2; chr_times_v.clone(), self.dirs[j].clone());
+            let chr_part = inner!(_, Vector<C>; U1, U2; chr_times_v.clone(), self.dirs[j].clone());
+            let cov_der = self.calculate_derivative(j);
+
             for i in 0..d {
-                result[i + (j + 1) * d] = -cov_der[i];
+                result[i + (j + 1) * d] = cov_der[i] - chr_part[i];
             }
         }
 
@@ -156,6 +211,8 @@ where
         Entity {
             x: new_x,
             dirs: new_dirs,
+            force: self.force,
+            ang_vel: self.ang_vel,
         }
     }
 }
