@@ -9,5 +9,9 @@ extern crate numeric_algs;
 pub use generic_array::typenum;
 
 pub mod coord_systems;
+mod entity;
 pub mod numeric;
-pub mod particle;
+mod particle;
+
+pub use crate::entity::Entity;
+pub use crate::particle::Particle;
