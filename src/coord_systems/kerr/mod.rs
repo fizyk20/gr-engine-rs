@@ -1,4 +1,5 @@
 mod eddington;
+mod polar_eddington;
 
 pub trait Properties {
     fn mass() -> f64;
@@ -6,3 +7,4 @@ pub trait Properties {
 }
 
 pub use self::eddington::EddingtonFinkelstein;
+pub use self::polar_eddington::{NearPole0EF, NearPolePiEF};

@@ -1,9 +1,10 @@
-use super::Properties;
+use super::{NearPole0EF, NearPolePiEF, Properties};
 use crate::typenum::consts::U4;
-use diffgeom::coordinates::{CoordinateSystem, Point};
+use diffgeom::coordinates::{ConversionTo, CoordinateSystem, Point};
 use diffgeom::metric::MetricSystem;
-use diffgeom::tensors::{ContravariantIndex, CovariantIndex, InvTwoForm, Tensor, TwoForm};
+use diffgeom::tensors::{ContravariantIndex, CovariantIndex, InvTwoForm, Matrix, Tensor, TwoForm};
 use generic_array::arr;
+use std::f64::consts::PI;
 use std::marker::PhantomData;
 
 pub struct EddingtonFinkelstein<P: Properties> {
@@ -135,4 +136,88 @@ impl<P: Properties> MetricSystem for EddingtonFinkelstein<P> {
     // TODO
     //fn dg(x: &Point<Self>) -> Tensor<Self, (CovariantIndex, (CovariantIndex, CovariantIndex))>
     //fn covariant_christoffel(x: &Point<Self>) -> Tensor<Self, (CovariantIndex, (CovariantIndex, CovariantIndex))>
+}
+
+impl<P: Properties + 'static> ConversionTo<NearPole0EF<P>> for EddingtonFinkelstein<P> {
+    fn convert_point(p: &Point<Self>) -> Point<NearPole0EF<P>> {
+        let th = p[2];
+        let ph = p[3];
+        let x = (th / 2.0).tan() * ph.cos();
+        let y = (th / 2.0).tan() * ph.sin();
+        Point::new(arr![f64; p[0], p[1], x, y])
+    }
+
+    fn jacobian(p: &Point<Self>) -> Matrix<NearPole0EF<P>> {
+        let t2 = p[2] / 2.0;
+        let ph = p[3];
+        let tan2th1 = 1.0 + t2.tan() * t2.tan();
+        Matrix::new(
+            Self::convert_point(p),
+            arr![f64;
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 2.0 * ph.cos() / tan2th1, 2.0 * ph.sin() / tan2th1,
+                0.0, 0.0, -ph.sin() / t2.tan(), ph.cos() / t2.tan(),
+            ],
+        )
+    }
+
+    fn inv_jacobian(
+        p: &Point<Self>,
+    ) -> Tensor<NearPole0EF<P>, (CovariantIndex, ContravariantIndex)> {
+        let t2 = p[2] / 2.0;
+        let ph = p[3];
+        let cos2t2 = t2.cos() * t2.cos();
+        Tensor::<NearPole0EF<P>, (CovariantIndex, ContravariantIndex)>::new(
+            Self::convert_point(p),
+            arr![f64;
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 0.5 * ph.cos() / cos2t2, -t2.tan() * ph.sin(),
+                0.0, 0.0, 0.5 * ph.sin() / cos2t2, t2.tan() * ph.cos(),
+            ],
+        )
+    }
+}
+
+impl<P: Properties + 'static> ConversionTo<NearPolePiEF<P>> for EddingtonFinkelstein<P> {
+    fn convert_point(p: &Point<Self>) -> Point<NearPolePiEF<P>> {
+        let th = p[2];
+        let ph = p[3];
+        let x = ((PI - th) / 2.0).tan() * ph.cos();
+        let y = ((PI - th) / 2.0).tan() * ph.sin();
+        Point::new(arr![f64; p[0], p[1], x, y])
+    }
+
+    fn jacobian(p: &Point<Self>) -> Matrix<NearPolePiEF<P>> {
+        let t2 = p[2] / 2.0;
+        let ph = p[3];
+        let tan2th1 = 1.0 + t2.tan() * t2.tan();
+        Matrix::new(
+            Self::convert_point(p),
+            arr![f64;
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, -2.0 * ph.cos() / tan2th1, -2.0 * ph.sin() / tan2th1,
+                0.0, 0.0, -ph.sin() / t2.tan(), ph.cos() / t2.tan(),
+            ],
+        )
+    }
+
+    fn inv_jacobian(
+        p: &Point<Self>,
+    ) -> Tensor<NearPolePiEF<P>, (CovariantIndex, ContravariantIndex)> {
+        let t2 = p[2] / 2.0;
+        let ph = p[3];
+        let cos2t2 = t2.cos() * t2.cos();
+        Tensor::<NearPolePiEF<P>, (CovariantIndex, ContravariantIndex)>::new(
+            Self::convert_point(p),
+            arr![f64;
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, -0.5 * ph.cos() / cos2t2, -t2.tan() * ph.sin(),
+                0.0, 0.0, -0.5 * ph.sin() / cos2t2, t2.tan() * ph.cos(),
+            ],
+        )
+    }
 }
