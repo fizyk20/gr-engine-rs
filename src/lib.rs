@@ -14,4 +14,4 @@ pub mod numeric;
 mod particle;
 
 pub use crate::entity::Entity;
-pub use crate::particle::Particle;
+pub use crate::particle::{Particle, PosAndVel};
